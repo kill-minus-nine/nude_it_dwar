@@ -49,7 +49,6 @@ def get_validated_user_url(url):
     if host_name not in SUPPORTED_HOSTNAMES:
         return f'Supports only {SUPPORTED_HOSTNAMES} hostnames', None
 
-    print(url)
     if url.endswith(ESCAPED_MINOR):
         url = f'{parse_result.scheme}://{parse_result.netloc.replace("w1", "w2")}{parse_result.path}?{parse_result.query.replace(ESCAPED_MINOR, "")}'
     elif url.endswith(ESCAPED_PRIME):
