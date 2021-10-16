@@ -37,10 +37,10 @@ async def on_message(message):
     user_url = message.content
     error, validated_url = helpers.get_validated_user_url(user_url)
     if error is not None:
+        if error == helpers.NOT_VALID_URL_ERROR:
+            return
         await message.reply(f'`{error}`', mention_author=True)
         return
-
-    print(validated_url)
 
     reply = ''
 

@@ -31,9 +31,13 @@ def escape_string(str_arg):
 
 ESCAPED_MINOR = escape_string(' (ФЭО-Минор)')
 ESCAPED_PRIME = escape_string(' (ФЭО-Прайм)')
+NOT_VALID_URL_ERROR = 'Not a valid url'
 
 
 def get_validated_user_url(url):
+    if not validators.url(url):
+        return NOT_VALID_URL_ERROR, None
+
     url_parts = url.split('nick=')
     if len(url_parts) != 2:
         return 'Url doesn\'t contain nick part', None
@@ -41,7 +45,7 @@ def get_validated_user_url(url):
     original_nick = url_parts[1]
     url = url.replace(original_nick, escape_string(original_nick))
     if not validators.url(url):
-        return 'Not a valid url', None
+        return 'Not a valid url after nick escaping', None
 
     parse_result = up.urlparse(url)
     host_name = parse_result.netloc
