@@ -35,7 +35,7 @@ NOT_VALID_URL_ERROR = 'Not a valid url'
 
 
 def get_validated_user_url(url):
-    if not validators.url(url):
+    if not validators.url(escape_string(url)):
         return NOT_VALID_URL_ERROR, None
 
     url_parts = url.split('nick=')
