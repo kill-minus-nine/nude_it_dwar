@@ -1,3 +1,4 @@
+import ssl
 import validators
 import urllib.parse as up
 import urllib.request as ur
@@ -64,7 +65,10 @@ def get_validated_user_url(url):
 def get_parse_result_and_html(url):
     parse_result = up.urlparse(url)
 
-    with ur.urlopen(url) as response:
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    with ur.urlopen(url, context=ctx) as response:
         return parse_result, response.read()
 
 

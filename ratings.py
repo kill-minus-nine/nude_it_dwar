@@ -96,7 +96,7 @@ def get_row_from_rating(parse_result, nick, rating_id=None):
     rating_url = f'{parse_result.scheme}://{parse_result.netloc}/rating.php'
     if rating_id is not None:
         rating_url += f'?rating_id={rating_id}'
-    r = requests.post(rating_url, data={'nick': nick})
+    r = requests.post(rating_url, data={'nick': nick}, verify=False)
     soup = BS(r.text, features="html.parser")
 
     person_row = soup.find('tr', class_='bg_l3')

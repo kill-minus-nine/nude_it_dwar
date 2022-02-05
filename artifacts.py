@@ -19,7 +19,11 @@ TYPE_ID_TO_KIND_ID_TO_NAME = {
             20: 'броня',
             21: 'кольчуга',
             44: 'меч2',
-            116: 'лук'  # ugly hack for presenting bow as armor
+            116: 'лук',  # ugly hack for presenting bow as armor
+            183: 'клановый меч',
+            184: 'клановый щит',
+            185: 'клановый меч2',
+            186: 'клановый двурук',
         },
     ),
     18: (

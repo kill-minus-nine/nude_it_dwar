@@ -8,6 +8,10 @@ import companion
 import helpers
 import ratings
 
+import urllib3
+
+urllib3.disable_warnings()
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 DISCORD_NUDE_CHANNEL_NAME = os.getenv('DISCORD_NUDE_CHANNEL_NAME')
