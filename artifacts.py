@@ -4,32 +4,35 @@ import helpers
 
 SHMOT_TYPE_ID = 3
 LUK_TYPE_ID = 92
+STYLE_TYPE_ID = 111
+STYLE_WEAPON_TYPE_ID = 2
+
 TYPE_ID_TO_KIND_ID_TO_NAME = {
     SHMOT_TYPE_ID: (
         'шмот',
         {
             1: 'шлем',
-            2: 'сапоги',
-            5: 'наручи',
-            6: 'поножи',
+            2: 'сапог',
+            5: 'руки',
+            6: 'понож',
             7: 'плечи',
             10: 'меч',
             12: 'двурук',
             17: 'щит',
             20: 'броня',
-            21: 'кольчуга',
+            21: 'кольча',
             44: 'меч2',
             116: 'лук',  # ugly hack for presenting bow as armor
-            183: 'клановый меч',
-            184: 'клановый щит',
-            185: 'клановый меч2',
-            186: 'клановый двурук',
+            183: 'клан меч',
+            184: 'клан щит',
+            185: 'клан меч2',
+            186: 'клан двурук',
         },
     ),
     18: (
         'юва',
         {
-            25: 'амулет',
+            25: 'амуль',
             76: 'кольцо'
         },
     ),
@@ -42,11 +45,13 @@ TYPE_ID_TO_KIND_ID_TO_NAME = {
             44: 'туфил'
         }
     ),
-    LUK_TYPE_ID: ()
+    LUK_TYPE_ID: (),
+    STYLE_TYPE_ID: (),
+    STYLE_WEAPON_TYPE_ID: ()
 }
 
 
-def get_type_to_kind_and_id(art_alts):
+def get_type_to_kinds(art_alts):
     type_to_kind = {}
     for art_alt in art_alts:
         art_contents = art_alt.contents
@@ -71,12 +76,39 @@ def get_type_to_kind_and_id(art_alts):
                 type_id = SHMOT_TYPE_ID
 
             kind_id = int(art_json['kind_id'])
+
+            style = False
+            if type_id in (STYLE_TYPE_ID, STYLE_WEAPON_TYPE_ID):
+                style = True
+                for type_id_tmp, type_arr in TYPE_ID_TO_KIND_ID_TO_NAME.items():
+                    if len(type_arr) == 2 and kind_id in type_arr[1]:
+                        type_id = type_id_tmp
+
             if kind_id not in TYPE_ID_TO_KIND_ID_TO_NAME[type_id][1]:
                 continue
 
             if type_id not in type_to_kind:
                 type_to_kind[type_id] = []
-            type_to_kind[type_id].append((kind_id, art_json["id"]))
+
+            kind = None
+            for kind_obj in type_to_kind[type_id]:
+                if kind_obj['kind_id'] != kind_id:
+                    continue
+                if style:
+                    if 'style_id' in kind_obj:
+                        continue
+                else:
+                    if 'main_id' in kind_obj:
+                        continue
+                kind = kind_obj
+            if kind is None:
+                kind = {'kind_id': kind_id}
+                type_to_kind[type_id].append(kind)
+
+            if style:
+                kind['style_id'] = art_json["id"]
+            else:
+                kind['main_id'] = art_json["id"]
 
     return type_to_kind
 
@@ -90,20 +122,21 @@ def get_block(validated_url):
     soup = BS(user_html, features="html.parser")
 
     # firstly try to find table with arts (it's td with id=userCanvas)
-    user_table = soup.find('td', {'id': 'userCanvas'})
+    user_table = soup.find('td', {'width': '1%', 'valign': 'top', 'align': 'center'})  # ugly, switch to regexp
     if user_table is None:
         return '`Cannot find table with user artifacts`\n'
 
-    type_to_kind_and_id = get_type_to_kind_and_id(user_table.findChildren('script', recursive=False))
+    type_to_kinds = get_type_to_kinds(user_table.findChildren('script', recursive=False))
     block = ''
-    for type_id in sorted(type_to_kind_and_id):
-        block += f'***{TYPE_ID_TO_KIND_ID_TO_NAME[type_id][0]}***\n'
+    for type_id in sorted(type_to_kinds):
+        if block != '':
+            block += '\n'
 
-        type_to_kind_and_id[type_id].sort(key=lambda kind_and_id_tup: kind_and_id_tup[0])
-        for kind_and_id in type_to_kind_and_id[type_id]:
-            art_kind_id = kind_and_id[0]
-            art_id = kind_and_id[1]
-            block += f'{TYPE_ID_TO_KIND_ID_TO_NAME[type_id][1][art_kind_id]}: '
-            block += f'{parse_result.scheme}://{parse_result.netloc}/artifact_info.php?artifact_id={art_id}\n'
+        for kind_obj in type_to_kinds[type_id]:
 
+            if 'main_id' in kind_obj:
+                block += f'[{TYPE_ID_TO_KIND_ID_TO_NAME[type_id][1][kind_obj["kind_id"]]}]({parse_result.scheme}://{parse_result.netloc}/artifact_info.php?artifact_id={kind_obj["main_id"]}) '
+            if 'style_id' in kind_obj:
+                block += f'([_{TYPE_ID_TO_KIND_ID_TO_NAME[type_id][1][kind_obj["kind_id"]]}_]({parse_result.scheme}://{parse_result.netloc}/artifact_info.php?artifact_id={kind_obj["style_id"]}))'
+            block += '\n'
     return block

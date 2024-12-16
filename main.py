@@ -46,24 +46,16 @@ async def on_message(message):
         await message.reply(f'`{error}`', mention_author=True)
         return
 
-    reply = ''
-
-    art_block = artifacts.get_block(validated_url)
-    reply += ':safety_vest: **АРТЕФАКТЫ** :safety_vest:\n'
-    reply += art_block
-    reply += '\n'
-
     ratings_block = ratings.get_block(validated_url)
-    reply += ':first_place: **РЕЙТИНГИ** :first_place:\n'
-    reply += ratings_block
-    reply += '\n'
+    comp_block = companion.get_block(validated_url)
+    art_block = artifacts.get_block(validated_url)
 
-    companion_block = companion.get_block(validated_url)
-    reply += ':space_invader: **ТЕНЬ** :space_invader:\n'
-    reply += companion_block
-    reply += '\n'
-
-    await message.reply(reply, mention_author=True)
-
+    reply = ratings_block + '\n' + comp_block + '\n' + art_block
+    try:
+        await message.reply(reply, mention_author=True)
+    except discord.errors.HTTPException as x:
+        if '2000' in x.text:
+            await message.reply(ratings_block + '\n' + comp_block, mention_author=True)
+            await message.reply(art_block, mention_author=True)
 
 bot.run(TOKEN)

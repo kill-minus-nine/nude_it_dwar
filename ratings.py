@@ -145,32 +145,32 @@ def get_block(validated_url):
     if error is not None:
         return f'`{error}`\n'
 
-    block = f'***Уровень: *** {lvl}\n'
+    block = f'Лвл: {lvl}\n'
 
     error, scalps_in_rating = get_val_from_rating(parse_result, nick, RATING_ID_SCALP)
     if error is not None:
         return f'`{error}`\n'
     dragon_level = get_dragon_lvl_by_scalps(scalps_in_rating)
-    block += f'***Уровень дракона: *** {dragon_level}\n'
+    block += f'Драк: {dragon_level}\n'
     scalps_in_info = get_scalps_in_info(validated_url)
     if scalps_in_info is not None:
         dragon_with_scalps = get_dragon_lvl_by_scalps(scalps_in_rating + scalps_in_info)
         if dragon_with_scalps != dragon_level:
-            block += f'***Уровень дракона если сдать скальпы: *** {dragon_with_scalps}\n'
+            block += f'Драк скальп: {dragon_with_scalps}\n'
 
     error, rr_in_rating = get_val_from_rating(parse_result, nick, RATING_ID_RR)
     if error is not None:
         return f'`{error}`\n'
-    block += f'***РР: *** {rr_in_rating}\n'
+    block += f'РР: {rr_in_rating}\n'
 
     error, exp_in_rating = get_val_from_rating(parse_result, nick, RATING_ID_EXP)
     if error is not None:
         return f'`{error}`\n'
-    block += f'***Опыт: *** {round(get_exp_percent_by_points(lvl, exp_in_rating), 2)}%\n'
+    block += f'Опыт: {round(get_exp_percent_by_points(lvl, exp_in_rating), 2)}%\n'
 
     error, dobla_in_rating = get_val_from_rating(parse_result, nick, RATING_ID_DOBLA)
     if error is not None:
         return f'`{error}`\n'
-    block += f'***Доблесть: *** {round(get_dobla_percent_by_points(dobla_in_rating), 2)}%\n'
+    block += f'Добла: {round(get_dobla_percent_by_points(dobla_in_rating), 2)}%\n'
 
     return block

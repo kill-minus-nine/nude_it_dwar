@@ -9,4 +9,4 @@ def get_block(validated_url):
         return f'`{error}`\n'
 
     nick = nick.replace(' ', '+')
-    return f'{parse_result.scheme}://{parse_result.netloc}/companion_info.php?nick={nick}\n'
+    return f'[Тень]({parse_result.scheme}://{parse_result.netloc}/companion_info.php?nick={nick})\n'
