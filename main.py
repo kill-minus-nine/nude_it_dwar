@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 import discord
-from discord.ext import commands
 
 import artifacts
 import companion
@@ -18,7 +17,8 @@ DISCORD_NUDE_CHANNEL_NAME = os.getenv('DISCORD_NUDE_CHANNEL_NAME')
 
 intents = discord.Intents.default()
 intents.members = True  # Subscribe to the privileged members intent.
-bot = commands.Bot(command_prefix='!', intents=intents)
+intents.message_content = True
+bot = discord.Client(command_prefix='!', intents=intents)
 
 
 @bot.event
